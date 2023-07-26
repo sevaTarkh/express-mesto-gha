@@ -1,0 +1,10 @@
+.popup__field_type_dark{
+    color: #CCCCCC;
+    border-bottom: 2px solid #CCCCCC;
+    background-color: unset;
+    margin-bottom: 30px;
+}
+
+.popup__field_type_dark:last-of-type{
+    margin-bottom: 0;
+}

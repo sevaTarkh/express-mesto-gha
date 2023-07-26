@@ -1,0 +1,12 @@
+.popup__container{
+    display: flex;
+    justify-self: center;
+    align-self: center;
+    position: relative;
+    flex-direction: column;
+}
+@media screen and (max-width: 890px) {
+    .popup__container{
+        max-width: 288px;
+    }
+}

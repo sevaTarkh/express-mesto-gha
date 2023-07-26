@@ -1,0 +1,15 @@
+.element__image{
+    width: 282px;
+    height: 282px;
+    margin: 0;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    object-fit: cover;
+    filter: brightness(80%);
+    z-index: -1;
+    background-color: black;
+    color: white;
+}
+.element__image:hover{
+    cursor: pointer;
+}
