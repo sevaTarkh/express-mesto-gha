@@ -18,6 +18,13 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use('/users', routerUser);
 
+app.use((req, res, next) => {
+  req.user = {
+    _id: '64c2921ee691692506ac8968' // вставьте сюда _id созданного в предыдущем пункте пользователя
+  };
+  next();
+});
+
 app.listen(PORT, () =>{
   console.log(`Application is runnig on port ${PORT}`)
 });

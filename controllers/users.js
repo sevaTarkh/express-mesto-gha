@@ -38,11 +38,21 @@ module.exports.createUser = (req, res) => {
   }))
 }
 module.exports.setUserInfo = (req, res) => {
-  console.log(req.user._id);
+
   const {name, about} = req.body;
   const { userId } = req.user;
 
-  User.findByIdAndUpdate(userId, {name, about})
+  User.findByIdAndUpdate(
+    userId,
+    {
+      name,
+      about
+    },
+    {
+      new: true,
+      runValidators: true,
+    }
+  )
   .then((user) => {
     if(!user){
       return res.status(404).send({
@@ -65,7 +75,15 @@ module.exports.setUserAvatar = (req, res) => {
   console.log(req.user._id);
   const {avatar} = req.body;
   const { userId } = req.user;
-  User.findByIdAndUpdate(userId, {avatar})
+  User.findByIdAndUpdate(
+    userId, {
+      avatar
+    },
+    {
+      new: true,
+      runValidators: true,
+    }
+    )
   .then((user) => {
     if(!user){
       return res.status(404).send({
