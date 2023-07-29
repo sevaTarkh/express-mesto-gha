@@ -38,7 +38,7 @@ module.exports.createUser = (req, res) => {
   User.create({name, about, avatar})
   .then((user) => res.send({user}))
   .catch((err) => {
-    if (err.name === 'ValidationError'){
+    if (err.name === 'ValidationError' || err.name === 'CastError'){
       res.status(400).send({
         message:'Произошла ошибка: Bad Request'
       })
@@ -73,7 +73,7 @@ module.exports.setUserInfo = (req, res) => {
     res.send({ user })
   })
   .catch((err) => {
-    if (err.name === 'ValidationError'){
+    if (err.name === 'ValidationError' || err.name === 'CastError'){
       res.status(400).send({
         message:'Произошла ошибка: Bad Request'
       })
@@ -107,7 +107,7 @@ module.exports.setUserAvatar = (req, res) => {
     res.send({ user })
   })
   .catch((err) => {
-    if (err.name === 'ValidationError'){
+    if (err.name === 'ValidationError' || err.name === 'CastError'){
       res.status(400).send({
         message:'Произошла ошибка: Bad Request'
       })
