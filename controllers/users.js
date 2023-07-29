@@ -1,12 +1,14 @@
 const User = require('../models/user');
 
-module.exports.getUsersInfo = (_, res, next) => {
+module.exports.getUsersInfo = (_, res) => {
   User
     .find({})
     .then((user) => res.send(user))
-    .catch(next)
+    .catch((err) => res.status(500).send({
+      message: 'Произошла ошибка: Server Error'
+    }))
 }
-module.exports.getUserInfoById = (req, res, next) => {
+module.exports.getUserInfoById = (req, res) => {
 
   const { id } = req.params;
   User.findById(id)
@@ -36,8 +38,10 @@ module.exports.createUser = (req, res) => {
   User.create({name, about, avatar})
   .then((user) => res.send({user}))
   .catch((err) => {
-    if (err.name === 'CastError'){
-      res.status(400).send('Произошла ошибка: Bad Request')
+    if (err.name === 'ValidationError'){
+      res.status(400).send({
+        message:'Произошла ошибка: Bad Request'
+      })
     }else{
       res.status(500).send({
         message:'Произошла ошибка: Server Error'
@@ -46,9 +50,8 @@ module.exports.createUser = (req, res) => {
   })
 }
 module.exports.setUserInfo = (req, res) => {
-
-  const {name, about} = req.body;
-  const { userId } = req.user;
+  const { name, about } = req.body;
+  const { _id: userId } = req.user;
 
   User.findByIdAndUpdate(
     userId,
@@ -58,7 +61,7 @@ module.exports.setUserInfo = (req, res) => {
     },
     {
       new: true,
-      runValidators: true,
+      runValidators: true
     }
   )
   .then((user) => {
@@ -67,10 +70,10 @@ module.exports.setUserInfo = (req, res) => {
         message: 'Произошла ошибка: Not Found'
       })
     }
-    res.send(user)
+    res.send({ user })
   })
   .catch((err) => {
-    if (err.name === 'CastError'){
+    if (err.name === 'ValidationError'){
       res.status(400).send({
         message:'Произошла ошибка: Bad Request'
       })
@@ -82,11 +85,12 @@ module.exports.setUserInfo = (req, res) => {
   })
 }
 module.exports.setUserAvatar = (req, res) => {
-  console.log(req.user._id);
-  const {avatar} = req.body;
-  const { userId } = req.user;
+  const { avatar } = req.body;
+  const { _id: userId } = req.user;
+
   User.findByIdAndUpdate(
-    userId, {
+    userId,
+    {
       avatar
     },
     {
@@ -100,10 +104,10 @@ module.exports.setUserAvatar = (req, res) => {
         message: 'Произошла ошибка: Not Found'
       })
     }
-    res.send(user)
+    res.send({ user })
   })
   .catch((err) => {
-    if (err.name === 'CastError'){
+    if (err.name === 'ValidationError'){
       res.status(400).send({
         message:'Произошла ошибка: Bad Request'
       })
