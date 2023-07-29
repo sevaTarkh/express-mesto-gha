@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const routerUser = require('./routes/users');
-//const routerCard = require('./routes/cards')
+const routerCard = require('./routes/cards')
 
 
 const {PORT = 3000} = process.env;
@@ -27,7 +27,7 @@ app.use((req, res, next) => {
 
 
 app.use('/users', routerUser);
-//app.use('/cards', routerCard);
+app.use('/cards', routerCard);
 
 
 

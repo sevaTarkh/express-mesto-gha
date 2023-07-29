@@ -12,7 +12,9 @@ module.exports.getCards = (_, res) => {
 module.exports.createCard = (req, res) => {
 
   const {name, link} = req.body;
-  Card.create({name, link})
+  const { _id: userId } = req.user;
+
+  Card.create({name, link, owner: userId})
   .then((card) => res.send({card}))
   .catch((err) => {
     if (err.name === 'CastError'){
@@ -26,27 +28,34 @@ module.exports.createCard = (req, res) => {
     }
   })
 }
-module.exports.deleteCard = (req, res, next) => {
-  const { cardId } = req.params;
+module.exports.deleteCard = (req, res) => {
+  const { cardId: cardId } = req.params;
+  const { _id: userId } = req.user;
 
-  Card.findById({cardId})
+  Card.findById(cardId)
   .then((card) => {
     if(!card){
       return res.status(404).send({
         message: 'Произошла ошибка: Not Found'
       })
     }
-    const ownerId = card.owner.id;
-    const userId = req.user._id;
-    if (ownerId !== userId){
-      throw new Error('Нельзя удалять не свои карточки')
+    const  { owner: ownerId } = card;
+
+    if (ownerId.valueOf() !== userId){
+      return res.status(404).send({
+        message: 'Произошла ошибка: Its not your card'
+      })
     }
-    card
-      .remove()
-      .then(() => res.send(card))
-      .catch(next)
+    return Card.findByIdAndRemove(cardId)
+      .then(() => res.send({
+        message: "Карточка удалена"
+      }))
   })
-  .catch(next)
+  .catch((err) => {
+      res.status(500).send({
+        message: 'Произошла ошибка: Server Error'
+      })
+  })
 }
 module.exports.likeCard = (req, res) => {
   const { cardId } = req.params;
