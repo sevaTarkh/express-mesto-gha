@@ -20,13 +20,17 @@ module.exports.getUserInfoById = (req, res, next) => {
   })
   .catch((err) => {
     if (err.name === 'CastError'){
-      res.status(400).send('Произошла ошибка: Bad Request')
+      res.status(400).send({
+        message:'Произошла ошибка: Bad Request'
+      })
     }else{
-      next(err)
+      res.status(500).send({
+        message:'Произошла ошибка: Server Error'
+      })
     }
   })
 }
-module.exports.createUser = (req, res, next) => {
+module.exports.createUser = (req, res) => {
 
   const {name, about, avatar} = req.body;
   User.create({name, about, avatar})
@@ -35,11 +39,13 @@ module.exports.createUser = (req, res, next) => {
     if (err.name === 'CastError'){
       res.status(400).send('Произошла ошибка: Bad Request')
     }else{
-      next(err)
+      res.status(500).send({
+        message:'Произошла ошибка: Server Error'
+      })
     }
   })
 }
-module.exports.setUserInfo = (req, res, next) => {
+module.exports.setUserInfo = (req, res) => {
 
   const {name, about} = req.body;
   const { userId } = req.user;
@@ -65,13 +71,17 @@ module.exports.setUserInfo = (req, res, next) => {
   })
   .catch((err) => {
     if (err.name === 'CastError'){
-      res.status(400).send('Произошла ошибка: Bad Request')
+      res.status(400).send({
+        message:'Произошла ошибка: Bad Request'
+      })
     }else{
-      next(err)
+      res.status(500).send({
+        message:'Произошла ошибка: Server Error'
+      })
     }
   })
 }
-module.exports.setUserAvatar = (req, res, next) => {
+module.exports.setUserAvatar = (req, res) => {
   console.log(req.user._id);
   const {avatar} = req.body;
   const { userId } = req.user;
@@ -94,9 +104,13 @@ module.exports.setUserAvatar = (req, res, next) => {
   })
   .catch((err) => {
     if (err.name === 'CastError'){
-      res.status(400).send('Произошла ошибка: Bad Request')
+      res.status(400).send({
+        message:'Произошла ошибка: Bad Request'
+      })
     }else{
-      next(err)
+      res.status(500).send({
+        message:'Произошла ошибка: Server Error'
+      })
     }
   })
 }
