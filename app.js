@@ -5,6 +5,8 @@ const routerUser = require('./routes/users');
 const routerCard = require('./routes/cards')
 
 
+const ERROR_BAD_REQUEST = 404;
+
 const {PORT = 3000} = process.env;
 
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb',{
@@ -30,7 +32,7 @@ app.use('/users', routerUser);
 app.use('/cards', routerCard);
 
 app.use('*', (req, res)=>{
-  res.status(404).send({
+  res.status(ERROR_BAD_REQUEST).send({
     message: 'Произошла ошибка: Not Found'
   })
 })

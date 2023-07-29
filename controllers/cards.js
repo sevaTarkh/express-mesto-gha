@@ -1,10 +1,15 @@
 const Card = require('../models/card');
 
+const ERROR_CODE = 400;
+const ERROR_FORBIDDEN = 403;
+const ERROR_BAD_REQUEST = 404;
+const ERROR_SERVER = 500;
+
 module.exports.getCards = (_, res) => {
   Card.find({})
   .then((card) => res.send(card))
   .catch((err) => {
-      res.status(500).send({
+      res.status(ERROR_SERVER).send({
         message: 'Произошла ошибка: Server Error'
       })
   })
@@ -17,12 +22,12 @@ module.exports.createCard = (req, res) => {
   Card.create({name, link, owner: userId})
   .then((card) => res.send({card}))
   .catch((err) => {
-    if (err.name === 'ValidationError'){
-      res.status(400).send({
+    if (err.name === 'ValidationError' || err.name === 'CastError'){
+      res.status(ERROR_CODE).send({
         message:'Произошла ошибка: Bad Request'
       })
     }else{
-      res.status(500).send({
+      res.status(ERROR_SERVER).send({
         message:'Произошла ошибка: Server Error'
       })
     }
@@ -35,14 +40,14 @@ module.exports.deleteCard = (req, res) => {
   Card.findById(cardId)
   .then((card) => {
     if(!card){
-      return res.status(404).send({
+      return res.status(ERROR_BAD_REQUEST).send({
         message: 'Произошла ошибка: Not Found'
       })
     }
     const  { owner: ownerId } = card;
 
     if (ownerId.valueOf() !== userId){
-      return res.status(403).send({
+      return res.status(ERROR_FORBIDDEN).send({
         message: 'Произошла ошибка: Its not your card'
       })
     }
@@ -53,11 +58,11 @@ module.exports.deleteCard = (req, res) => {
   })
   .catch((err) => {
     if (err.name === 'ValidationError' || err.name === 'CastError'){
-      res.status(400).send({
+      res.status(ERROR_CODE).send({
         message:'Произошла ошибка: Bad Request'
       })
     }else{
-      res.status(500).send({
+      res.status(ERROR_SERVER).send({
         message:'Произошла ошибка: Server Error'
       })
     }
@@ -79,19 +84,19 @@ module.exports.likeCard = (req, res) => {
   )
   .then((card) => {
     if(!card){
-      return res.status(404).send({
+      return res.status(ERROR_BAD_REQUEST).send({
         message: 'Произошла ошибка: Not Found'
       })
     }
     res.send(card)
   })
   .catch((err) => {
-    if (err.name === 'CastError'){
-      res.status(400).send({
+    if (err.name === 'ValidationError' || err.name === 'CastError'){
+      res.status(ERROR_CODE).send({
         message:'Произошла ошибка: Bad Request'
       })
     }else{
-      res.status(500).send({
+      res.status(ERROR_SERVER).send({
         message: 'Произошла ошибка: Server Error'
       })
     }
@@ -113,19 +118,19 @@ module.exports.dislikeCard = (req, res) => {
   )
   .then((card) => {
     if(!card){
-      return res.status(404).send({
+      return res.status(ERROR_BAD_REQUEST).send({
         message: 'Произошла ошибка: Not Found'
       })
     }
     res.send(card)
   })
   .catch((err) => {
-    if (err.name === 'CastError'){
-      res.status(400).send({
+    if (err.name === 'ValidationError' || err.name === 'CastError'){
+      res.status(ERROR_CODE).send({
         message:'Произошла ошибка: Bad Request'
       })
     }else{
-      res.status(500).send({
+      res.status(ERROR_SERVER).send({
         message: 'Произошла ошибка: Server Error'
       })
     }
