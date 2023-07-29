@@ -7,67 +7,72 @@ const ERROR_SERVER = 500;
 
 module.exports.getCards = (_, res) => {
   Card.find({})
-  .then((card) => res.send(card))
-  .catch((err) => {
+    .then((card) => res.send(card))
+    .catch(() => {
       res.status(ERROR_SERVER).send({
-        message: 'Произошла ошибка: Server Error'
-      })
-  })
-}
-module.exports.createCard = (req, res) => {
+        message: 'Произошла ошибка: Server Error',
+      });
+    });
+};
 
-  const {name, link} = req.body;
+module.exports.createCard = (req, res) => {
+  const { name, link } = req.body;
   const { _id: userId } = req.user;
 
-  Card.create({name, link, owner: userId})
-  .then((card) => res.send({card}))
-  .catch((err) => {
-    if (err.name === 'ValidationError' || err.name === 'CastError'){
-      res.status(ERROR_CODE).send({
-        message:'Произошла ошибка: Bad Request'
-      })
-    }else{
-      res.status(ERROR_SERVER).send({
-        message:'Произошла ошибка: Server Error'
-      })
-    }
+  Card.create({
+    name,
+    link,
+    owner: userId,
   })
-}
+    .then((card) => res.status(201).send(card))
+    .catch((err) => {
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
+        res.status(ERROR_CODE).send({
+          message: 'Произошла ошибка: Bad Request',
+        });
+      } else {
+        res.status(ERROR_SERVER).send({
+          message: 'Произошла ошибка: Server Error',
+        });
+      }
+    });
+};
+
 module.exports.deleteCard = (req, res) => {
-  const { cardId: cardId } = req.params;
+  const { cardId } = req.params;
   const { _id: userId } = req.user;
 
   Card.findById(cardId)
-  .then((card) => {
-    if(!card){
-      return res.status(ERROR_BAD_REQUEST).send({
-        message: 'Произошла ошибка: Not Found'
-      })
-    }
-    const  { owner: ownerId } = card;
+    .then((card) => {
+      if (!card) {
+        return res.status(ERROR_BAD_REQUEST).send({
+          message: 'Произошла ошибка: Not Found',
+        });
+      }
+      const { owner: ownerId } = card;
 
-    if (ownerId.valueOf() !== userId){
-      return res.status(ERROR_FORBIDDEN).send({
-        message: 'Произошла ошибка: Its not your card'
-      })
-    }
-    return Card.findByIdAndRemove(cardId)
-      .then(() => res.send({
-        message: "Карточка удалена"
-      }))
-  })
-  .catch((err) => {
-    if (err.name === 'ValidationError' || err.name === 'CastError'){
-      res.status(ERROR_CODE).send({
-        message:'Произошла ошибка: Bad Request'
-      })
-    }else{
-      res.status(ERROR_SERVER).send({
-        message:'Произошла ошибка: Server Error'
-      })
-    }
-  })
-}
+      if (ownerId.valueOf() !== userId) {
+        return res.status(ERROR_FORBIDDEN).send({
+          message: 'Произошла ошибка: Its not your card',
+        });
+      }
+      return Card.findByIdAndRemove(cardId)
+        .then(() => res.send({
+          message: 'Карточка удалена',
+        }));
+    })
+    .catch((err) => {
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
+        res.status(ERROR_CODE).send({
+          message: 'Произошла ошибка: Bad Request',
+        });
+      } else {
+        res.status(ERROR_SERVER).send({
+          message: 'Произошла ошибка: Server Error',
+        });
+      }
+    });
+};
 module.exports.likeCard = (req, res) => {
   const { cardId } = req.params;
   const { _id: userId } = req.user;
@@ -75,33 +80,34 @@ module.exports.likeCard = (req, res) => {
     cardId,
     {
       $addToSet: {
-        likes:userId
-      }
+        likes: userId,
+      },
     },
     {
-      new: true
-    }
+      new: true,
+    },
   )
-  .then((card) => {
-    if(!card){
-      return res.status(ERROR_BAD_REQUEST).send({
-        message: 'Произошла ошибка: Not Found'
-      })
-    }
-    res.send(card)
-  })
-  .catch((err) => {
-    if (err.name === 'ValidationError' || err.name === 'CastError'){
-      res.status(ERROR_CODE).send({
-        message:'Произошла ошибка: Bad Request'
-      })
-    }else{
-      res.status(ERROR_SERVER).send({
-        message: 'Произошла ошибка: Server Error'
-      })
-    }
-  })
-}
+    .then((card) => {
+      if (!card) {
+        res.status(ERROR_BAD_REQUEST).send({
+          message: 'Произошла ошибка: Not Found',
+        });
+      }
+      res.send(card);
+    })
+    .catch((err) => {
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
+        res.status(ERROR_CODE).send({
+          message: 'Произошла ошибка: Bad Request',
+        });
+      } else {
+        res.status(ERROR_SERVER).send({
+          message: 'Произошла ошибка: Server Error',
+        });
+      }
+    });
+};
+
 module.exports.dislikeCard = (req, res) => {
   const { cardId } = req.params;
   const { _id: userId } = req.user;
@@ -109,30 +115,30 @@ module.exports.dislikeCard = (req, res) => {
     cardId,
     {
       $pull: {
-        likes:userId
-      }
+        likes: userId,
+      },
     },
     {
-      new: true
-    }
+      new: true,
+    },
   )
-  .then((card) => {
-    if(!card){
-      return res.status(ERROR_BAD_REQUEST).send({
-        message: 'Произошла ошибка: Not Found'
-      })
-    }
-    res.send(card)
-  })
-  .catch((err) => {
-    if (err.name === 'ValidationError' || err.name === 'CastError'){
-      res.status(ERROR_CODE).send({
-        message:'Произошла ошибка: Bad Request'
-      })
-    }else{
-      res.status(ERROR_SERVER).send({
-        message: 'Произошла ошибка: Server Error'
-      })
-    }
-  })
-}
+    .then((card) => {
+      if (!card) {
+        res.status(ERROR_BAD_REQUEST).send({
+          message: 'Произошла ошибка: Not Found',
+        });
+      }
+      res.send(card);
+    })
+    .catch((err) => {
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
+        res.status(ERROR_CODE).send({
+          message: 'Произошла ошибка: Bad Request',
+        });
+      } else {
+        res.status(ERROR_SERVER).send({
+          message: 'Произошла ошибка: Server Error',
+        });
+      }
+    });
+};
