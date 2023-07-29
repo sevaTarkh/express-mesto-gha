@@ -29,7 +29,11 @@ app.use((req, res, next) => {
 app.use('/users', routerUser);
 app.use('/cards', routerCard);
 
-
+app.use('*', (req, res)=>{
+  res.status(404).send({
+    message: 'Произошла ошибка: Not Found'
+  })
+})
 
 app.listen(PORT, () =>{
   console.log(`Application is runnig on port ${PORT}`)
