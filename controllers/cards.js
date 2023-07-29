@@ -17,13 +17,13 @@ module.exports.createCard = (req, res) => {
   Card.create({name, link, owner: userId})
   .then((card) => res.send({card}))
   .catch((err) => {
-    if (err.name === 'CastError'){
+    if (err.name === 'ValidationError'){
       res.status(400).send({
         message:'Произошла ошибка: Bad Request'
       })
     }else{
       res.status(500).send({
-        message: 'Произошла ошибка: Server Error'
+        message:'Произошла ошибка: Server Error'
       })
     }
   })
@@ -42,7 +42,7 @@ module.exports.deleteCard = (req, res) => {
     const  { owner: ownerId } = card;
 
     if (ownerId.valueOf() !== userId){
-      return res.status(404).send({
+      return res.status(403).send({
         message: 'Произошла ошибка: Its not your card'
       })
     }
@@ -52,9 +52,15 @@ module.exports.deleteCard = (req, res) => {
       }))
   })
   .catch((err) => {
-      res.status(500).send({
-        message: 'Произошла ошибка: Server Error'
+    if (err.name === 'ValidationError'){
+      res.status(400).send({
+        message:'Произошла ошибка: Bad Request'
       })
+    }else{
+      res.status(500).send({
+        message:'Произошла ошибка: Server Error'
+      })
+    }
   })
 }
 module.exports.likeCard = (req, res) => {
