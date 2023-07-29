@@ -4,22 +4,16 @@ module.exports.getCards = (_, res) => {
   Card.find({})
   .then((card) => res.send(card))
   .catch((err) => {
-    if (err.name === 'CastError'){
-      res.status(400).send({
-        message:'Произошла ошибка: Bad Request'}
-        )
-    }else{
       res.status(500).send({
         message: 'Произошла ошибка: Server Error'
       })
-    }
   })
 }
 module.exports.createCard = (req, res) => {
-  cconsole.log(req.user._id);
+
   const {name, link} = req.body;
   Card.create({name, link})
-  .then((card) => res.send(card))
+  .then((card) => res.send({card}))
   .catch((err) => {
     if (err.name === 'CastError'){
       res.status(400).send({
