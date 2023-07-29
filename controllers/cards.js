@@ -5,7 +5,9 @@ module.exports.getCards = (_, res) => {
   .then((card) => res.send(card))
   .catch((err) => {
     if (err.name === 'CastError'){
-      res.status(400).send('Произошла ошибка: Bad Request')
+      res.status(400).send({
+        message:'Произошла ошибка: Bad Request'}
+        )
     }else{
       res.status(500).send({
         message: 'Произошла ошибка: Server Error'
@@ -20,7 +22,9 @@ module.exports.createCard = (req, res) => {
   .then((card) => res.send(card))
   .catch((err) => {
     if (err.name === 'CastError'){
-      res.status(400).send('Произошла ошибка: Bad Request')
+      res.status(400).send({
+        message:'Произошла ошибка: Bad Request'
+      })
     }else{
       res.status(500).send({
         message: 'Произошла ошибка: Server Error'
@@ -52,7 +56,7 @@ module.exports.deleteCard = (req, res, next) => {
 }
 module.exports.likeCard = (req, res) => {
   const { cardId } = req.params;
-  const { userId } = req.user;
+  const { _id: userId } = req.user;
   Card.findByIdAndUpdate(
     cardId,
     {
@@ -74,7 +78,9 @@ module.exports.likeCard = (req, res) => {
   })
   .catch((err) => {
     if (err.name === 'CastError'){
-      res.status(400).send('Произошла ошибка: Bad Request')
+      res.status(400).send({
+        message:'Произошла ошибка: Bad Request'
+      })
     }else{
       res.status(500).send({
         message: 'Произошла ошибка: Server Error'
@@ -84,7 +90,7 @@ module.exports.likeCard = (req, res) => {
 }
 module.exports.dislikeCard = (req, res) => {
   const { cardId } = req.params;
-  const { userId } = req.user;
+  const { _id: userId } = req.user;
   Card.findByIdAndUpdate(
     cardId,
     {
@@ -106,7 +112,9 @@ module.exports.dislikeCard = (req, res) => {
   })
   .catch((err) => {
     if (err.name === 'CastError'){
-      res.status(400).send('Произошла ошибка: Bad Request')
+      res.status(400).send({
+        message:'Произошла ошибка: Bad Request'
+      })
     }else{
       res.status(500).send({
         message: 'Произошла ошибка: Server Error'
