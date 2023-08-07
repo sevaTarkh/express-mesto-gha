@@ -1,3 +1,5 @@
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
 const ERROR_CODE = 400;
@@ -38,8 +40,21 @@ module.exports.getUserInfoById = (req, res) => {
 };
 
 module.exports.createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar })
+  const {
+    name,
+    about,
+    avatar,
+    email,
+    password,
+  } = req.body;
+  bcrypt.hash(password, 10)
+    .then((hash) => User.create({
+      name,
+      about,
+      avatar,
+      email,
+      password: hash,
+    }))
     .then((user) => res.status(201).send({ user }))
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
@@ -51,6 +66,18 @@ module.exports.createUser = (req, res) => {
           message: 'Произошла ошибка: Server Error',
         });
       }
+    });
+};
+module.exports.loginUser = (req, res) => {
+  const { email, password } = req.body;
+
+  User.findUserByCredentials(email, password)
+    .then(({ _id: userId }) => {
+      if (userId) {
+        const token = jwt.sign({ userId }, 'super-strong-secret', { expiresIn: '7d' });
+      }
+
+      return res.send({ _id: token });
     });
 };
 module.exports.setUserInfo = (req, res) => {
