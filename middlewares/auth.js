@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 
 const AuthError = require('../errors/AuthError');
 
-module.exports.auth = (req, res, next) => {
+module.exports = (req, res, next) => {
   const { auth } = req.headers;
   const barear = 'Barear ';
 
