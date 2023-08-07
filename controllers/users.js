@@ -2,44 +2,53 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
-const ERROR_CODE = 400;
-const ERROR_BAD_REQUEST = 404;
-const ERROR_SERVER = 500;
+const BadRequestError = require('../errors/BadRequestError');
+const NotFoundError = require('../errors/NotFoundError');
+const AuthError = require('../errors/AuthError');
+const ConflictError = require('../errors/ConflictError');
 
-module.exports.getUsersInfo = (_, res) => {
+module.exports.getUsersInfo = (_, res, next) => {
   User
     .find({})
     .then((user) => res.send(user))
-    .catch(() => res.status(ERROR_SERVER).send({
-      message: 'Произошла ошибка: Server Error',
-    }));
+    .catch(next);
 };
 
-module.exports.getUserInfoById = (req, res) => {
+module.exports.getUserInfoById = (req, res, next) => {
   const { id } = req.params;
   User.findById(id)
     .then((user) => {
       if (!user) {
-        res.status(ERROR_BAD_REQUEST).send({
-          message: 'Произошла ошибка: Not Found',
-        });
+        throw new NotFoundError('Произошла ошибка: Not Found');
       }
       res.send({ user });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(ERROR_CODE).send({
-          message: 'Произошла ошибка: Bad Request',
-        });
+        next(new BadRequestError('Произошла ошибка: Bad Request'));
       } else {
-        res.status(ERROR_SERVER).send({
-          message: 'Произошла ошибка: Server Error',
-        });
+        next(err);
       }
     });
 };
-
-module.exports.createUser = (req, res) => {
+module.exports.getCurrentUserInfo = (req, res, next) => {
+  const { id } = req.user;
+  User.findById(id)
+    .then((user) => {
+      if (!user) {
+        throw new NotFoundError('Произошла ошибка: Not Found');
+      }
+      res.send({ user });
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BadRequestError('Произошла ошибка: Bad Request'));
+      } else {
+        next(err);
+      }
+    });
+};
+module.exports.createUser = (req, res, next) => {
   const {
     name,
     about,
@@ -57,30 +66,29 @@ module.exports.createUser = (req, res) => {
     }))
     .then((user) => res.status(201).send({ user }))
     .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'CastError') {
-        res.status(ERROR_CODE).send({
-          message: 'Произошла ошибка: Bad Request',
-        });
+      if (err.code === 11000) {
+        next(new ConflictError('Произошла ошибка: User with this email already exists'));
+      } else if (err.name === 'ValidationError' || err.name === 'CastError') {
+        next(new BadRequestError('Произошла ошибка: Bad Request'));
       } else {
-        res.status(ERROR_SERVER).send({
-          message: 'Произошла ошибка: Server Error',
-        });
+        next(err);
       }
     });
 };
-module.exports.loginUser = (req, res) => {
+module.exports.loginUser = (req, res, next) => {
   const { email, password } = req.body;
 
   User.findUserByCredentials(email, password)
-    .then(({ _id: userId }) => {
-      if (userId) {
-        const token = jwt.sign({ userId }, 'super-strong-secret', { expiresIn: '7d' });
-      }
-
-      return res.send({ _id: token });
+    .then((user) => {
+      res.send({
+        token: jwt.sign({ _id: user._id }, 'super-strong-secret', { expiresIn: '7d' }),
+      });
+    })
+    .catch(() => {
+      next(new AuthError('Произошла ошибка: Auth Error'));
     });
 };
-module.exports.setUserInfo = (req, res) => {
+module.exports.setUserInfo = (req, res, next) => {
   const { name, about } = req.body;
   const { _id: userId } = req.user;
 
@@ -97,25 +105,19 @@ module.exports.setUserInfo = (req, res) => {
   )
     .then((user) => {
       if (!user) {
-        res.status(ERROR_BAD_REQUEST).send({
-          message: 'Произошла ошибка: Not Found',
-        });
+        throw new NotFoundError('Произошла ошибка: Not Found');
       }
       res.send({ user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        res.status(ERROR_CODE).send({
-          message: 'Произошла ошибка: Bad Request',
-        });
+        next(new BadRequestError('Произошла ошибка: Bad Request'));
       } else {
-        res.status(ERROR_SERVER).send({
-          message: 'Произошла ошибка: Server Error',
-        });
+        next(err);
       }
     });
 };
-module.exports.setUserAvatar = (req, res) => {
+module.exports.setUserAvatar = (req, res, next) => {
   const { avatar } = req.body;
   const { _id: userId } = req.user;
 
@@ -131,21 +133,15 @@ module.exports.setUserAvatar = (req, res) => {
   )
     .then((user) => {
       if (!user) {
-        res.status(ERROR_BAD_REQUEST).send({
-          message: 'Произошла ошибка: Not Found',
-        });
+        throw new NotFoundError('Произошла ошибка: Not Found');
       }
       res.send({ user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        res.status(ERROR_CODE).send({
-          message: 'Произошла ошибка: Bad Request',
-        });
+        next(new BadRequestError('Произошла ошибка: Bad Request'));
       } else {
-        res.status(ERROR_SERVER).send({
-          message: 'Произошла ошибка: Server Error',
-        });
+        next(err);
       }
     });
 };
