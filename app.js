@@ -1,10 +1,10 @@
 const express = require('express');
+const { errors } = require('celebrate');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const routerUser = require('./routes/users');
 const routerCard = require('./routes/cards');
 const auth = require('./middlewares/auth');
-const { errors } = require('celebrate');
 
 const NotFoundError = require('./errors/NotFoundError');
 
