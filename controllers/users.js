@@ -13,41 +13,6 @@ module.exports.getUsersInfo = (_, res, next) => {
     .then((users) => res.send({ users }))
     .catch(next);
 };
-
-module.exports.getUserInfoById = (req, res, next) => {
-  const { id } = req.params;
-  User.findById(id)
-    .then((user) => {
-      if (!user) {
-        throw new NotFoundError('Произошла ошибка: Not Found');
-      }
-      res.send({ user });
-    })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new BadRequestError('Произошла ошибка: Bad Request'));
-      } else {
-        next(err);
-      }
-    });
-};
-module.exports.getCurrentUserInfo = (req, res, next) => {
-  const { userId } = req.user._id;
-  User.findById(userId)
-    .then((user) => {
-      if (!user) {
-        throw new NotFoundError('Произошла ошибка: Not Found');
-      }
-      res.send({ user });
-    })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new BadRequestError('Произошла ошибка: Bad Request'));
-      } else {
-        next(err);
-      }
-    });
-};
 module.exports.createUser = (req, res, next) => {
   const {
     name,
@@ -122,6 +87,41 @@ module.exports.setUserInfo = (req, res, next) => {
       }
     });
 };
+module.exports.getUserInfoById = (req, res, next) => {
+  const { id } = req.params;
+  User.findById(id)
+    .then((user) => {
+      if (!user) {
+        throw new NotFoundError('Произошла ошибка: Not Found');
+      }
+      res.send({ user });
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BadRequestError('Произошла ошибка: Bad Request'));
+      } else {
+        next(err);
+      }
+    });
+};
+module.exports.getCurrentUserInfo = (req, res, next) => {
+  const { _id: userId } = req.user;
+  User.findById(userId)
+    .then((user) => {
+      if (!user) {
+        throw new NotFoundError('Произошла ошибка: Not Found');
+      }
+      res.send({ user });
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BadRequestError('Произошла ошибка: Bad Request'));
+      } else {
+        next(err);
+      }
+    });
+};
+
 module.exports.setUserAvatar = (req, res, next) => {
   const { avatar } = req.body;
   const { _id: userId } = req.user;
