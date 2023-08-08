@@ -4,13 +4,13 @@ const AuthError = require('../errors/AuthError');
 
 module.exports = (req, res, next) => {
   const { auth } = req.headers;
-  const barear = 'Barear ';
+  const bearer = 'Bearer ';
 
-  if (!auth || !auth.startsWith('Bearer ')) {
+  if (!auth || !auth.startsWith(bearer)) {
     return next(new AuthError('Произошла ошибка: Auth Error'));
   }
 
-  const token = auth.replace(barear, '');
+  const token = auth.replace(bearer, '');
   let payload;
 
   try {

@@ -10,7 +10,7 @@ const ConflictError = require('../errors/ConflictError');
 module.exports.getUsersInfo = (_, res, next) => {
   User
     .find({})
-    .then((user) => res.send(user))
+    .then((users) => res.send({ users }))
     .catch(next);
 };
 
@@ -74,7 +74,7 @@ module.exports.createUser = (req, res, next) => {
       });
     })
     .catch((err) => {
-      if (err.name === 'MongoServerError' && err.code === 11000) {
+      if (err.code === 11000) {
         next(new ConflictError('Произошла ошибка: User with this email already exists'));
       } else if (err.name === 'ValidationError' || err.name === 'CastError') {
         next(new BadRequestError('Произошла ошибка: Bad Request'));
