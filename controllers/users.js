@@ -32,7 +32,7 @@ module.exports.getUserInfoById = (req, res, next) => {
     });
 };
 module.exports.getCurrentUserInfo = (req, res, next) => {
-  const { _id: userId } = req.user;
+  const { userId } = req.user._id;
   User.findById(userId)
     .then((user) => {
       if (!user) {
