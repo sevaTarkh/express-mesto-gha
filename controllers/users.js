@@ -65,12 +65,7 @@ module.exports.createUser = (req, res, next) => {
       password: hash,
     }))
     .then((user) => {
-      res.status(201).send({
-        name: user.name,
-        about: user.about,
-        avatar: user.avatar,
-        email: user.email,
-      });
+      res.status(201).send(user);
     })
     .catch((err) => {
       if (err.code === 11000) {
@@ -78,7 +73,7 @@ module.exports.createUser = (req, res, next) => {
       } else if (err.name === 'ValidationError' || err.name === 'CastError') {
         next(new BadRequestError('Произошла ошибка: Bad Request'));
       } else {
-        next(err, '123123123123');
+        next(err);
       }
     });
 };
@@ -86,9 +81,9 @@ module.exports.loginUser = (req, res, next) => {
   const { email, password } = req.body;
 
   User.findUserByCredentials(email, password)
-    .then((user) => {
+    .then(({ _id: userId }) => {
       res.send({
-        token: jwt.sign({ _id: user._id }, 'super-strong-secret', { expiresIn: '7d' }),
+        token: jwt.sign({ userId }, 'super-strong-secret', { expiresIn: '7d' }),
       });
     })
     .catch(() => next(new AuthError('Произошла ошибка: Auth Error')));

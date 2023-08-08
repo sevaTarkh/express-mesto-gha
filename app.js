@@ -21,10 +21,9 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use('/', routerSignIn);
 app.use('/', routerSignUp);
+app.use('/', routerSignIn);
 
-app.use(auth);
 app.use('/users', auth, routerUser);
 app.use('/cards', auth, routerCard);
 
