@@ -32,8 +32,8 @@ module.exports.getUserInfoById = (req, res, next) => {
     });
 };
 module.exports.getCurrentUserInfo = (req, res, next) => {
-  const { id } = req.user;
-  User.findById(id)
+  const { _id: userId } = req.user;
+  User.findById(userId)
     .then((user) => {
       if (!user) {
         throw new NotFoundError('Произошла ошибка: Not Found');
@@ -89,12 +89,9 @@ module.exports.loginUser = (req, res, next) => {
   return User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, 'super-strong-secret', { expiresIn: '7d' });
-      if (!token) {
-        throw new AuthError('Произошла ошибка: Auth Error');
-      }
       res.send({ token });
     })
-    .catch(next);
+    .catch(() => next(new AuthError('Произошла ошибка: Auth Error')));
 };
 module.exports.setUserInfo = (req, res, next) => {
   const { name, about } = req.body;
