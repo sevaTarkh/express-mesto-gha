@@ -84,9 +84,7 @@ module.exports.loginUser = (req, res, next) => {
         token: jwt.sign({ _id: user._id }, 'super-strong-secret', { expiresIn: '7d' }),
       });
     })
-    .catch(() => {
-      next(new AuthError('Произошла ошибка: Auth Error'));
-    });
+    .catch(() => next(new AuthError('Произошла ошибка: Auth Error')));
 };
 module.exports.setUserInfo = (req, res, next) => {
   const { name, about } = req.body;

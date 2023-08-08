@@ -5,12 +5,16 @@ const {
   createUser,
   setUserInfo,
   setUserAvatar,
+  loginUser,
+  getCurrentUserInfo,
 } = require('../controllers/users');
 
 router.get('/', getUsersInfo);
 router.get('/:id', getUserInfoById);
-router.post('/', createUser);
+router.get('/me', getCurrentUserInfo);
 router.patch('/me', setUserInfo);
 router.patch('/me/avatar', setUserAvatar);
+router.post('/signin', loginUser);
+router.post('/signup', createUser);
 
 module.exports = router;

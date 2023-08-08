@@ -1,21 +1,16 @@
 const Card = require('../models/card');
 
-const ERROR_CODE = 400;
-const ERROR_FORBIDDEN = 403;
-const ERROR_BAD_REQUEST = 404;
-const ERROR_SERVER = 500;
+const BadRequestError = require('../errors/BadRequestError');
+const NotFoundError = require('../errors/NotFoundError');
+const ForbiddenError = require('../errors/ForbiddenError');
 
-module.exports.getCards = (_, res) => {
+module.exports.getCards = (_, res, next) => {
   Card.find({})
     .then((card) => res.send(card))
-    .catch(() => {
-      res.status(ERROR_SERVER).send({
-        message: 'Произошла ошибка: Server Error',
-      });
-    });
+    .catch(next);
 };
 
-module.exports.createCard = (req, res) => {
+module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
   const { _id: userId } = req.user;
 
@@ -27,34 +22,26 @@ module.exports.createCard = (req, res) => {
     .then((card) => res.status(201).send(card))
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        res.status(ERROR_CODE).send({
-          message: 'Произошла ошибка: Bad Request',
-        });
+        next(new BadRequestError('Произошла ошибка: Bad Request'));
       } else {
-        res.status(ERROR_SERVER).send({
-          message: 'Произошла ошибка: Server Error',
-        });
+        next(err);
       }
     });
 };
 
-module.exports.deleteCard = (req, res) => {
+module.exports.deleteCard = (req, res, next) => {
   const { cardId } = req.params;
   const { _id: userId } = req.user;
 
   Card.findById(cardId)
     .then((card) => {
       if (!card) {
-        return res.status(ERROR_BAD_REQUEST).send({
-          message: 'Произошла ошибка: Not Found',
-        });
+        throw new NotFoundError('Произошла ошибка: Not Found');
       }
       const { owner: ownerId } = card;
 
       if (ownerId.valueOf() !== userId) {
-        return res.status(ERROR_FORBIDDEN).send({
-          message: 'Произошла ошибка: Its not your card',
-        });
+        throw new ForbiddenError('Произошла ошибка: Its not your card');
       }
       return Card.findByIdAndRemove(cardId)
         .then(() => res.send({
@@ -63,17 +50,13 @@ module.exports.deleteCard = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        res.status(ERROR_CODE).send({
-          message: 'Произошла ошибка: Bad Request',
-        });
+        next(new BadRequestError('Произошла ошибка: Bad Request'));
       } else {
-        res.status(ERROR_SERVER).send({
-          message: 'Произошла ошибка: Server Error',
-        });
+        next(err);
       }
     });
 };
-module.exports.likeCard = (req, res) => {
+module.exports.likeCard = (req, res, next) => {
   const { cardId } = req.params;
   const { _id: userId } = req.user;
   Card.findByIdAndUpdate(
@@ -89,26 +72,20 @@ module.exports.likeCard = (req, res) => {
   )
     .then((card) => {
       if (!card) {
-        res.status(ERROR_BAD_REQUEST).send({
-          message: 'Произошла ошибка: Not Found',
-        });
+        throw new NotFoundError('Произошла ошибка: Not Found');
       }
       res.send(card);
     })
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        res.status(ERROR_CODE).send({
-          message: 'Произошла ошибка: Bad Request',
-        });
+        next(new BadRequestError('Произошла ошибка: Bad Request'));
       } else {
-        res.status(ERROR_SERVER).send({
-          message: 'Произошла ошибка: Server Error',
-        });
+        next(err);
       }
     });
 };
 
-module.exports.dislikeCard = (req, res) => {
+module.exports.dislikeCard = (req, res, next) => {
   const { cardId } = req.params;
   const { _id: userId } = req.user;
   Card.findByIdAndUpdate(
@@ -124,21 +101,15 @@ module.exports.dislikeCard = (req, res) => {
   )
     .then((card) => {
       if (!card) {
-        res.status(ERROR_BAD_REQUEST).send({
-          message: 'Произошла ошибка: Not Found',
-        });
+        throw new NotFoundError('Произошла ошибка: Not Found');
       }
       res.send(card);
     })
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        res.status(ERROR_CODE).send({
-          message: 'Произошла ошибка: Bad Request',
-        });
+        next(new BadRequestError('Произошла ошибка: Bad Request'));
       } else {
-        res.status(ERROR_SERVER).send({
-          message: 'Произошла ошибка: Server Error',
-        });
+        next(err);
       }
     });
 };
