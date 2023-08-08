@@ -4,8 +4,8 @@ const User = require('../models/user');
 
 const BadRequestError = require('../errors/BadRequestError');
 const NotFoundError = require('../errors/NotFoundError');
-const AuthError = require('../errors/AuthError');
 const ConflictError = require('../errors/ConflictError');
+const AuthError = require('../errors/AuthError');
 
 module.exports.getUsersInfo = (_, res, next) => {
   User
@@ -86,13 +86,15 @@ module.exports.createUser = (req, res, next) => {
 module.exports.loginUser = (req, res, next) => {
   const { email, password } = req.body;
 
-  User.findUserByCredentials(email, password)
-    .then(({ _id: userId }) => {
-      res.send({
-        token: jwt.sign({ userId }, 'super-strong-secret', { expiresIn: '7d' }),
-      });
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, 'super-strong-secret', { expiresIn: '7d' });
+      if (!token) {
+        throw new AuthError('Произошла ошибка: Auth Error');
+      }
+      res.send({ token });
     })
-    .catch(() => next(new AuthError('Произошла ошибка: Auth Error')));
+    .catch(next);
 };
 module.exports.setUserInfo = (req, res, next) => {
   const { name, about } = req.body;

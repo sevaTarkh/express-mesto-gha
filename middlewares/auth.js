@@ -3,14 +3,13 @@ const jwt = require('jsonwebtoken');
 const AuthError = require('../errors/AuthError');
 
 module.exports = (req, res, next) => {
-  const { auth } = req.headers;
-  const bearer = 'Bearer ';
+  const { authorization } = req.headers;
 
-  if (!auth || !auth.startsWith(bearer)) {
-    return next(new AuthError('Произошла ошибка: Auth Error'));
+  if (!authorization || !authorization.startsWith('Bearer ')) {
+    next(new AuthError('Произошла ошибка: Auth Error 11111'));
   }
 
-  const token = auth.replace(bearer, '');
+  const token = authorization.replace('Bearer ', '');
   let payload;
 
   try {
