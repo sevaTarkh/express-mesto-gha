@@ -4,6 +4,8 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const routerUser = require('./routes/users');
 const routerCard = require('./routes/cards');
+const routerSignIn = require('./routes/SignIn');
+const routerSignUp = require('./routes/SignUp');
 const auth = require('./middlewares/auth');
 
 const NotFoundError = require('./errors/NotFoundError');
@@ -23,6 +25,8 @@ app.use(auth);
 
 app.use('/users', routerUser);
 app.use('/cards', routerCard);
+app.use('/', routerSignIn);
+app.use('/', routerSignUp);
 
 app.use(errors());
 app.use((req, res, next) => next(new NotFoundError('Произошла ошибка: Not Found')));
