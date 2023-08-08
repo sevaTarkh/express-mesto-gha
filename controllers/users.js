@@ -65,10 +65,16 @@ module.exports.createUser = (req, res, next) => {
       password: hash,
     }))
     .then((user) => {
-      res.status(201).send(user);
+      res.status(201).send({
+        email: user.email,
+        name: user.name,
+        about: user.about,
+        avatar: user.avatar,
+        _id: user._id,
+      });
     })
     .catch((err) => {
-      if (err.code === 11000) {
+      if (err.name === 'MongoServerError' && err.code === 11000) {
         next(new ConflictError('Произошла ошибка: User with this email already exists'));
       } else if (err.name === 'ValidationError' || err.name === 'CastError') {
         next(new BadRequestError('Произошла ошибка: Bad Request'));

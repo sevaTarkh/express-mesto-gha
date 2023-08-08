@@ -7,6 +7,7 @@ const routerCard = require('./routes/cards');
 const routerSignIn = require('./routes/SignIn');
 const routerSignUp = require('./routes/SignUp');
 const auth = require('./middlewares/auth');
+const handleError = require('./middlewares/handleError');
 
 const NotFoundError = require('./errors/NotFoundError');
 
@@ -27,7 +28,8 @@ app.use('/', routerSignIn);
 app.use('/users', auth, routerUser);
 app.use('/cards', auth, routerCard);
 
-app.use(errors());
 app.use((req, res, next) => next(new NotFoundError('Произошла ошибка: Not Found')));
+app.use(errors());
+app.use(handleError);
 
 app.listen(PORT);
