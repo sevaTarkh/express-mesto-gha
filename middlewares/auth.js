@@ -2,10 +2,6 @@ const jwt = require('jsonwebtoken');
 
 const AuthError = require('../errors/AuthError');
 
-const extractBearerToken = (header) => {
-  header.replace('Bearer ', '');
-};
-
 module.exports = (req, res, next) => {
   const { authorization } = req.headers;
 
@@ -13,7 +9,7 @@ module.exports = (req, res, next) => {
     next(new AuthError('Произошла ошибка: Auth Error 11111'));
   }
 
-  const token = extractBearerToken(authorization);
+  const token = authorization.replace('Bearer ', '');
   let payload;
 
   try {
