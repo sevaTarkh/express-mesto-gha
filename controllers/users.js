@@ -64,14 +64,21 @@ module.exports.createUser = (req, res, next) => {
       email,
       password: hash,
     }))
-    .then((user) => res.status(201).send({ user }))
+    .then((user) => {
+      res.status(201).send({
+        name: user.name,
+        about: user.about,
+        avatar: user.avatar,
+        email: user.email,
+      });
+    })
     .catch((err) => {
       if (err.code === 11000) {
         next(new ConflictError('Произошла ошибка: User with this email already exists'));
       } else if (err.name === 'ValidationError' || err.name === 'CastError') {
         next(new BadRequestError('Произошла ошибка: Bad Request'));
       } else {
-        next(err);
+        next(err, '123123123123');
       }
     });
 };

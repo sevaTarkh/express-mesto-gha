@@ -21,12 +21,12 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use(auth);
-
-app.use('/users', routerUser);
-app.use('/cards', routerCard);
 app.use('/', routerSignIn);
 app.use('/', routerSignUp);
+
+app.use(auth);
+app.use('/users', auth, routerUser);
+app.use('/cards', auth, routerCard);
 
 app.use(errors());
 app.use((req, res, next) => next(new NotFoundError('Произошла ошибка: Not Found')));
