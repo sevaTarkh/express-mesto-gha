@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 
 const AuthError = require('../errors/AuthError');
 
-const { JWT_SECRET } = process.env;
+const { NODE_ENV, JWT_SECRET } = process.env;
 
 module.exports = (req, res, next) => {
   const { authorization } = req.headers;
@@ -15,7 +15,7 @@ module.exports = (req, res, next) => {
   let payload;
 
   try {
-    payload = jwt.verify(token, JWT_SECRET);
+    payload = jwt.verify(token, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret');
   } catch (err) {
     return next(new AuthError(`Произошла ошибка: token не совпадает ${token}, ${JWT_SECRET}`));
   }
