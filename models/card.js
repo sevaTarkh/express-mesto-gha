@@ -17,13 +17,13 @@ const cardShema = new mongoose.Schema({
     type: ObjectId,
     required: true,
   },
-  likes: {
+  likes: [{
     type: ObjectId,
-    defailt: [],
-  },
+    default: [],
+  }],
   createdAt: {
     type: Date,
-    defailt: Date.now,
+    default: Date.now,
   },
 });
 
