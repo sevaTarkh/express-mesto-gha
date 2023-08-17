@@ -17,7 +17,7 @@ module.exports = (req, res, next) => {
   try {
     payload = jwt.verify(token, JWT_SECRET);
   } catch (err) {
-    return next(new AuthError('Произошла ошибка: token не совпадает'));
+    return next(new AuthError(`Произошла ошибка: token не совпадает ${token}, ${JWT_SECRET}`));
   }
 
   req.user = payload;
